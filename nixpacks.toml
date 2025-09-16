@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ["bun", "openssl"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = ["bun install"]
+
+[start]
+cmd = "bun run start"
