@@ -31,10 +31,6 @@ func (w *Workspace) Insert(ctx context.Context) (primitive.ObjectID, error) {
 	return Insert(ctx, db.GetWorkspaceCollection(), w)
 }
 
-func (w *Workspace) GetByID(ctx context.Context) (*Workspace, error) {
-	return GetByID[Workspace](ctx, db.GetWorkspaceCollection(), w.ID.Hex())
-}
-
 func NewWorkspaceByName(name string) *Workspace {
 	return &Workspace{
 		Name:   name,
@@ -42,10 +38,27 @@ func NewWorkspaceByName(name string) *Workspace {
 	}
 }
 
-func NewWorkspaceById(id string) (*Workspace, error) {
-	objId, err := primitive.ObjectIDFromHex(id)
+func GetWorkspaceByID(ctx context.Context, id string) (*Workspace, error) {
+	return GetByID[Workspace](ctx, db.GetWorkspaceCollection(), id)
+}
+
+func GetWorkspaceByIDAndSecret(ctx context.Context, id, secret string) (*Workspace, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	return &Workspace{ID: objId}, nil
+
+	filter := map[string]any{
+		"_id":    objID,
+		"secret": secret,
+	}
+
+	return GetOneWithFilter[Workspace](ctx, db.GetWorkspaceCollection(), filter)
+}
+
+func GetWorkspaceBySecret(ctx context.Context, secret string) (*Workspace, error) {
+	filter := map[string]any{
+		"secret": secret,
+	}
+	return GetOneWithFilter[Workspace](ctx, db.GetWorkspaceCollection(), filter)
 }

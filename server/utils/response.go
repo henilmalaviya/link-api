@@ -23,3 +23,5 @@ func NewSuccessResponse(message string, data any) *Response {
 }
 
 var ResponseInvalidRequestPayload = NewErrorResponse("Invalid request payload")
+var ResponseInvalidRequestParameter = NewErrorResponse("Invalid request parameter")
+var ResponseSomethingWentWrong = NewErrorResponse("Something went wrong")

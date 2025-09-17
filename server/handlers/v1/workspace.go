@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"api.link.henil.dev/internal/db/entities"
+	"api.link.henil.dev/server/middlewares"
 	"api.link.henil.dev/server/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +34,7 @@ var ResponseFailedToCreateWorkspace = utils.NewErrorResponse("Failed to create w
 // @Param workspace body CreateWorkspaceRequest true "Workspace Name"
 // @Success 200 {object} utils.Response{data=CreateWorkspaceResponse} "Workspace created successfully"
 // @Failure 400 {object} utils.Response "Invalid request payload"
+// @Failure 500 {object} utils.Response "Failed to create workspace"
 // @Router /v1/workspaces [post]
 func CreateWorkspace(c *gin.Context) {
 	body, ok := utils.GetBodyJSON[CreateWorkspaceRequest](c)
@@ -58,6 +61,15 @@ func CreateWorkspace(c *gin.Context) {
 
 /* -------------------------------------------------------------------------- */
 
+type GetWorkspaceResponse struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+var ResponseWorkspaceNotFound = utils.NewErrorResponse("Workspace not found")
+var ResponseWorkspaceNotPermitted = utils.NewErrorResponse("You do not have access to this workspace")
+
 // GetWorkspaceByID godoc
 // @Summary Get workspace by ID
 // @Description Retrieve workspace details using its ID
@@ -67,9 +79,27 @@ func CreateWorkspace(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Workspace ID"
 // @Param x-workspace-secret header string true "Workspace Secret"
+// @Success 200 {object} utils.Response{data=GetWorkspaceResponse} "Workspace retrieved successfully"
+// @Failure 400 {object} utils.Response "Invalid request parameter"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 404 {object} utils.Response "Workspace not found"
+// @Failure 500 {object} utils.Response "Something went wrong"
 // @Router /v1/workspaces/{id} [get]
 func GetWorkspaceByID(c *gin.Context) {
+	id := c.Param("id")
 
+	workspaceCtx := c.MustGet(middlewares.WorkspaceContextKey).(*middlewares.WorkspaceContext)
+
+	if workspaceCtx.Workspace.ID.Hex() != id {
+		c.JSON(http.StatusForbidden, ResponseWorkspaceNotPermitted)
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.NewSuccessResponse("Workspace retrieved successfully", GetWorkspaceResponse{
+		ID:        workspaceCtx.Workspace.ID.Hex(),
+		Name:      workspaceCtx.Workspace.Name,
+		CreatedAt: workspaceCtx.Workspace.CreatedAt,
+	}))
 }
 
 /* -------------------------------------------------------------------------- */
