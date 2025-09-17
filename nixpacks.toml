@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["go", "make"]
+nixPkgs = ["go"]
 
 [phases.install]
 dependsOn = ["setup"]
