@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["go", "make"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = ["go mod download"]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["make"]
+
+[start]
+cmd = "./tmp/main"
