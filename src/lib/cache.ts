@@ -8,6 +8,7 @@ type RedirectRouteLinkFetchCacheValue = {
 	id: string
 	url: string
 	smartEngagementCounting: boolean | null
+	enabled: boolean
 } | null
 export const RedirectRouteLinkFetchCacheMemoizer = Modules.globalize(
 	'RedirectRouteLinkFetchCacheMemoizer',

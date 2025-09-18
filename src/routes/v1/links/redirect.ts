@@ -42,12 +42,12 @@ export const LinkRedirectRoute = baseElysia()
 									shortName: id,
 								},
 							],
-							enabled: true,
 						},
 						select: {
 							id: true,
 							url: true,
 							smartEngagementCounting: true,
+							enabled: true,
 						},
 					}),
 				),
@@ -65,6 +65,14 @@ export const LinkRedirectRoute = baseElysia()
 				return sendError(404, {
 					error: true,
 					message: 'Link not found',
+				})
+			}
+
+			if (link.enabled === false) {
+				return sendError(410, {
+					error: true,
+					message:
+						'Link is disabled, please contact the owner (whoever sent you this link) of the link for more information',
 				})
 			}
 
@@ -120,6 +128,7 @@ export const LinkRedirectRoute = baseElysia()
 				307: t.Object({}),
 				500: Responses.ErrorResponseSchema,
 				404: Responses.ErrorResponseSchema,
+				410: Responses.ErrorResponseSchema,
 			},
 			detail: {
 				description: 'Redirect to URL of a short link',
