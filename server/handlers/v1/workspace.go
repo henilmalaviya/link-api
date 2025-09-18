@@ -32,7 +32,7 @@ var ResponseFailedToCreateWorkspace = utils.NewErrorResponse("Failed to create w
 // @Accept json
 // @Produce json
 // @Param workspace body CreateWorkspaceRequest true "Workspace Name"
-// @Success 200 {object} utils.Response{data=CreateWorkspaceResponse} "Workspace created successfully"
+// @Success 201 {object} utils.Response{data=CreateWorkspaceResponse} "Workspace created successfully"
 // @Failure 400 {object} utils.Response "Invalid request payload"
 // @Failure 500 {object} utils.Response "Failed to create workspace"
 // @Router /v1/workspaces [post]
@@ -52,7 +52,7 @@ func CreateWorkspace(c *gin.Context) {
 
 	workspace.ID = id
 
-	c.JSON(http.StatusOK, utils.NewSuccessResponse("Workspace created successfully", CreateWorkspaceResponse{
+	c.JSON(http.StatusCreated, utils.NewSuccessResponse("Workspace created successfully", CreateWorkspaceResponse{
 		ID:     workspace.ID.Hex(),
 		Name:   workspace.Name,
 		Secret: workspace.Secret,

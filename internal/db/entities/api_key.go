@@ -19,7 +19,7 @@ const (
 )
 
 func generateApiKey() string {
-	key, err := utils.GenerateRandomString(16)
+	key, err := utils.GenerateRandomString(48)
 	if err != nil {
 		panic(err)
 	}
@@ -63,4 +63,17 @@ func NewApiKeyById(id string) (*ApiKey, error) {
 		return nil, err
 	}
 	return &ApiKey{ID: objId}, nil
+}
+
+func GetAllApiKeysByWorkspaceID(ctx context.Context, workspaceId string) ([]*ApiKey, error) {
+	objId, err := primitive.ObjectIDFromHex(workspaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := map[string]any{
+		"workspace_id": objId,
+	}
+
+	return GetWithFilter[ApiKey](ctx, db.GetApiKeyCollection(), filter)
 }

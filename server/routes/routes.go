@@ -12,7 +12,7 @@ func registerV1WorkspaceRoutes(rg *gin.RouterGroup) {
 		workspace.POST("/", v1Handlers.CreateWorkspace)
 
 		protected := workspace.Group("/")
-		protected.Use(middlewares.WorkspaceAuthMiddleware())
+		protected.Use(middlewares.WorkspaceSecretAuthMiddleware())
 		{
 			protected.GET("/:id", v1Handlers.GetWorkspaceByID)
 			protected.GET("/:id/stats", v1Handlers.GetWorkspaceStatsByID)
@@ -21,9 +21,12 @@ func registerV1WorkspaceRoutes(rg *gin.RouterGroup) {
 }
 
 func registerV1ApiKeyRoutes(rg *gin.RouterGroup) {
-	// apiKey := rg.Group("/api-keys")
-	// {
-	// }
+	apiKey := rg.Group("/api-keys")
+	apiKey.Use(middlewares.WorkspaceAuthMiddleware())
+	{
+		apiKey.POST("/", v1Handlers.CreateApiKey)
+		apiKey.GET("/", v1Handlers.GetAllApiKeys)
+	}
 }
 
 func registerV1LinksRoutes(rg *gin.RouterGroup) {
